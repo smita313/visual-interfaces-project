@@ -17,7 +17,6 @@ end
 keepGoing = 1;
 answers = [];
 while keepGoing
-    result = testImage(camera);
     fprintf('You are feeling: %s\n', testImage(camera));
     correct = input('Is this correct? y/n\n','s');
     if (~isempty(strfind(correct,'y')) || ~isempty(strfind(correct,'Y')))
