@@ -1,13 +1,11 @@
 %% Tracking a persons face in video
 % Copyright 2014 The MathWorks, Inc.
 
-%% Clear workspace
-clear all;
-close all;
-clc;
+function faceTrack(videoName)
+folderName = videoName(1:strfind(videoName, '.')-1);
 
 %% Read Video
-videoReader = vision.VideoFileReader('happy.avi');
+videoReader = vision.VideoFileReader(videoName);
 
 %% Create Video Player
 videoPlayer = vision.VideoPlayer;
@@ -71,3 +69,4 @@ end
 release(videoPlayer);
 release(videoReader);
 delete(videoPlayer); % delete will cause the viewer to close
+end
