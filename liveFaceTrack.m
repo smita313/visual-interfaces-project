@@ -17,6 +17,21 @@ numPts = 0;
 frameCount = 0;
 
 i = 0;
+videoPlayer.Name = sprintf('Make a %s face in: 3', folderName);
+videoFrame = snapshot(cam);
+step(videoPlayer, videoFrame);
+pause(1);
+videoPlayer.Name = sprintf('Make a %s face in: 2', folderName);
+videoFrame = snapshot(cam);
+step(videoPlayer, videoFrame);
+pause(1);
+videoPlayer.Name = sprintf('Make a %s face in: 1', folderName);
+videoFrame = snapshot(cam);
+step(videoPlayer, videoFrame);
+pause(1);
+videoPlayer.Name = sprintf('Make a %s face in: Go', folderName);
+videoFrame = snapshot(cam);
+step(videoPlayer, videoFrame);
 while runLoop && frameCount < 100
     i = i+1;
     
@@ -97,7 +112,7 @@ while runLoop && frameCount < 100
             im = imcrop(im, bboxRotated.BoundingBox);
             scaleFactor = 150/size(im,1);
             im = imresize(im, scaleFactor);
-            imwrite(im, strcat(folderName,'/',int2str(i),'.png'));
+            imwrite(im, strcat('training/', folderName,'/',int2str(i),'.png'));
             
             % Display a bounding box around the detected face.
             videoFrame = insertShape(videoFrame, 'Polygon', bboxPolygon, 'LineWidth', 3);
@@ -171,7 +186,7 @@ while runLoop && frameCount < 100
             im = imcrop(im, bboxRotated.BoundingBox);
             scaleFactor = 150/size(im,1);
             im = imresize(im, scaleFactor);
-            imwrite(im, strcat(folderName,'/',int2str(i),'.png'));
+            imwrite(im, strcat('training/', folderName,'/',int2str(i),'.png'));
 
             % Display a bounding box around the face being tracked.
             videoFrame = insertShape(videoFrame, 'Polygon', bboxPolygon, 'LineWidth', 3);

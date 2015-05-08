@@ -1,6 +1,7 @@
 function main
+clear('camera');
 collect = 1;
-if (~length(dir('happy')) > 2 &&  ~length(dir('surprised')) > 2)
+if (length(dir('training/happy')) > 2 &&  length(dir('training/surprised')) > 2)
     c = input('Do you want to collect new database photos? y/n\n','s');
     if (~isempty(strfind(c,'n')) || ~isempty(strfind(c,'N')))
         collect = 0;
@@ -16,7 +17,8 @@ end
 keepGoing = 1;
 answers = [];
 while keepGoing
-    result = testImage(webcam);
+    result = testImage(camera);
+    fprintf('You are feeling: %s\n', testImage(camera));
     correct = input('Is this correct? y/n\n','s');
     if (~isempty(strfind(correct,'y')) || ~isempty(strfind(correct,'Y')))
         corr = 1;
@@ -30,9 +32,16 @@ while keepGoing
         keepGoing = 1;
     end
 end
-a = unique(answers);
-output = histc(answers(:),a);
-fprintf('The number of correct responses is %d\n', output(2));
-fprintf('The number of incorrect responses is %d\n', output(1));
+numCorrect = 0;
+numIncorrect = 0;
+for i=1:length(answers)
+    if answers(i) == 0
+        numIncorrect = numIncorrect + 1;
+    else 
+        numCorrect = numCorrect + 1;
+    end
+end
+fprintf('The number of correct responses is %d\n', numCorrect);
+fprintf('The number of incorrect responses is %d\n', numIncorrect);
 clear('camera');
 end
