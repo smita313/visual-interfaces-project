@@ -53,19 +53,23 @@ while runLoop && frameCount < 100
             bboxPolygon = reshape(bboxPoints', 1, []);
             
             [lowestCorner, ~] = find(bboxPoints==max(bboxPoints(:,2)));
-            leftCorner = mod(lowestCorner(1)+1,4)+1;
-            rightCorner = mod(lowestCorner(1)-1,4)-1;
+            leftCorner = mod(lowestCorner(1)+1,5); if (leftCorner == 0); leftCorner = 1; end
+            rightCorner = mod(lowestCorner(1)-1,5); if (rightCorner == 0); rightCorner = 4; end
+            im = videoFrame;
+            im = insertMarker(im, bboxPoints(lowestCorner(1),:),'x','color', 'red', 'size', 20);
+            im = insertMarker(im, bboxPoints(leftCorner,:),'x','color', 'white', 'size', 20);
+            im = insertMarker(im, bboxPoints(rightCorner,:),'x','color', 'cyan', 'size', 20);
             
             if length(lowestCorner) > 1
                 angle = 0;
             elseif abs(bboxPoints(lowestCorner,2) - bboxPoints(leftCorner,2)) < abs(bboxPoints(lowestCorner,2) - bboxPoints(rightCorner,2))
                 % rotate counterclockwise
-                angle = atand(abs(bboxPoints(lowestCorner,2) - bboxPoints(leftCorner,2))/abs(bboxPoints(lowestCorner,1) - bboxPoints(leftCorner,1))) * -1;
+                angle = atand(abs(bboxPoints(lowestCorner,2) - bboxPoints(leftCorner,2))/abs(bboxPoints(lowestCorner,1) - bboxPoints(leftCorner,1)));
             else
                 % rotate clockwise
-                angle = atand(abs(bboxPoints(lowestCorner,2) - bboxPoints(rightCorner,2))/abs(bboxPoints(lowestCorner,1) - bboxPoints(rightCorner,1)));
+                angle = atand(abs(bboxPoints(lowestCorner,2) - bboxPoints(rightCorner,2))/abs(bboxPoints(lowestCorner,1) - bboxPoints(rightCorner,1))) * -1;
             end
-            im = imrotate(videoFrame, angle);
+            im = imrotate(im, angle);
             
             imwrite(im, strcat(folderName,'/',int2str(i),'.png'));
 
@@ -95,23 +99,25 @@ while runLoop && frameCount < 100
 
             % Convert the box corners into the [x1 y1 x2 y2 x3 y3 x4 y4]
             % format required by insertShape.
-            bboxPolygon = reshape(bboxPoints', 1, []);            
-            
+            bboxPolygon = reshape(bboxPoints', 1, []); 
             [lowestCorner, ~] = find(bboxPoints==max(bboxPoints(:,2)));
-            leftCorner = mod(lowestCorner(1)+1,4)+1;
-            rightCorner = mod(lowestCorner(1)-1,4)-1;
+            leftCorner = mod(lowestCorner(1)+1,5); if (leftCorner == 0); leftCorner = 1; end
+            rightCorner = mod(lowestCorner(1)-1,5); if (rightCorner == 0); rightCorner = 4; end
+            im = videoFrame;
+            im = insertMarker(im, bboxPoints(lowestCorner(1),:),'x','color', 'yellow', 'size', 20);
+            im = insertMarker(im, bboxPoints(leftCorner,:),'x','color', 'white', 'size', 20);
+            im = insertMarker(im, bboxPoints(rightCorner,:),'x','color', 'cyan', 'size', 20);
             
             if length(lowestCorner) > 1
                 angle = 0;
             elseif abs(bboxPoints(lowestCorner,2) - bboxPoints(leftCorner,2)) < abs(bboxPoints(lowestCorner,2) - bboxPoints(rightCorner,2))
                 % rotate counterclockwise
-                angle = atand(abs(bboxPoints(lowestCorner,2) - bboxPoints(leftCorner,2))/abs(bboxPoints(lowestCorner,1) - bboxPoints(leftCorner,1))) * -1;
+                angle = atand(abs(bboxPoints(lowestCorner,2) - bboxPoints(leftCorner,2))/abs(bboxPoints(lowestCorner,1) - bboxPoints(leftCorner,1)));
             else
                 % rotate clockwise
-                angle = atand(abs(bboxPoints(lowestCorner,2) - bboxPoints(rightCorner,2))/abs(bboxPoints(lowestCorner,1) - bboxPoints(rightCorner,1)));
+                angle = atand(abs(bboxPoints(lowestCorner,2) - bboxPoints(rightCorner,2))/abs(bboxPoints(lowestCorner,1) - bboxPoints(rightCorner,1))) * -1;
             end
-            angle
-            im = imrotate(videoFrame, angle);
+            im = imrotate(im, angle);
 %             im = imcrop(videoFrame, bbox);
 %             scaleFactor = 150/size(im,1);
 %             im = imresize(im, scaleFactor);
