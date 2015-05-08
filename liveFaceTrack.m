@@ -52,20 +52,21 @@ while runLoop && frameCount < 100
             % format required by insertShape.
             bboxPolygon = reshape(bboxPoints', 1, []);
             
-            cropSize = size(videoFrame);
-            invbboxPoints = bboxPoints';
-            mask = poly2mask(double(invbboxPoints(1,:)), double(invbboxPoints(2,:)), cropSize(1,1), cropSize(1,2));
+            [lowestCorner, ~] = find(bboxPoints==max(bboxPoints(:,2)));
+            leftCorner = mod(lowestCorner(1)+1,4)+1;
+            rightCorner = mod(lowestCorner(1)-1,4)-1;
             
-            R = videoFrame(:,:,1);
-            G = videoFrame(:,:,2);
-            B = videoFrame(:,:,3);
-            R(~mask) = 0;
-            G(~mask) = 0;
-            B(~mask) = 0;
-            im = cat(3,R,G,B);
-%             im = imcrop(videoFrame, bbox);
-%             scaleFactor = 150/size(im,1);
-%             im = imresize(im, scaleFactor);
+            if length(lowestCorner) > 1
+                angle = 0;
+            elseif abs(bboxPoints(lowestCorner,2) - bboxPoints(leftCorner,2)) < abs(bboxPoints(lowestCorner,2) - bboxPoints(rightCorner,2))
+                % rotate counterclockwise
+                angle = atand(abs(bboxPoints(lowestCorner,2) - bboxPoints(leftCorner,2))/abs(bboxPoints(lowestCorner,1) - bboxPoints(leftCorner,1))) * -1;
+            else
+                % rotate clockwise
+                angle = atand(abs(bboxPoints(lowestCorner,2) - bboxPoints(rightCorner,2))/abs(bboxPoints(lowestCorner,1) - bboxPoints(rightCorner,1)));
+            end
+            im = imrotate(videoFrame, angle);
+            
             imwrite(im, strcat(folderName,'/',int2str(i),'.png'));
 
             % Display a bounding box around the detected face.
@@ -94,21 +95,23 @@ while runLoop && frameCount < 100
 
             % Convert the box corners into the [x1 y1 x2 y2 x3 y3 x4 y4]
             % format required by insertShape.
-            bboxPolygon = reshape(bboxPoints', 1, []);
+            bboxPolygon = reshape(bboxPoints', 1, []);            
             
-            cropSize = size(videoFrame);
-            invbboxPoints = bboxPoints';
-            mask = poly2mask(double(invbboxPoints(1,:)), double(invbboxPoints(2,:)), cropSize(1,1), cropSize(1,2));
+            [lowestCorner, ~] = find(bboxPoints==max(bboxPoints(:,2)));
+            leftCorner = mod(lowestCorner(1)+1,4)+1;
+            rightCorner = mod(lowestCorner(1)-1,4)-1;
             
-            R = videoFrame(:,:,1);
-            G = videoFrame(:,:,2);
-            B = videoFrame(:,:,3);
-            R(~mask) = 0;
-            G(~mask) = 0;
-            B(~mask) = 0;
-            im = cat(3,R,G,B);
-            
-            
+            if length(lowestCorner) > 1
+                angle = 0;
+            elseif abs(bboxPoints(lowestCorner,2) - bboxPoints(leftCorner,2)) < abs(bboxPoints(lowestCorner,2) - bboxPoints(rightCorner,2))
+                % rotate counterclockwise
+                angle = atand(abs(bboxPoints(lowestCorner,2) - bboxPoints(leftCorner,2))/abs(bboxPoints(lowestCorner,1) - bboxPoints(leftCorner,1))) * -1;
+            else
+                % rotate clockwise
+                angle = atand(abs(bboxPoints(lowestCorner,2) - bboxPoints(rightCorner,2))/abs(bboxPoints(lowestCorner,1) - bboxPoints(rightCorner,1)));
+            end
+            angle
+            im = imrotate(videoFrame, angle);
 %             im = imcrop(videoFrame, bbox);
 %             scaleFactor = 150/size(im,1);
 %             im = imresize(im, scaleFactor);
