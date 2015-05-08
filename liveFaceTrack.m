@@ -52,13 +52,33 @@ while runLoop && frameCount < 100
             % format required by insertShape.
             bboxPolygon = reshape(bboxPoints', 1, []);
             
+            cropSize = size(videoFrame);
+            invbboxPoints = bboxPoints';
+            mask = poly2mask(double(invbboxPoints(1,:)), double(invbboxPoints(2,:)), cropSize(1,1), cropSize(1,2));
+            
+            R1 = videoFrame(:,:,1);
+            G1 = videoFrame(:,:,2);
+            B1 = videoFrame(:,:,3);
+            R1(~mask) = 0;
+            G1(~mask) = 0;
+            B1(~mask) = 0;
+            im = cat(3,R1,G1,B1);
+            
+            R2 = videoFrame(:,:,1);
+            G2 = videoFrame(:,:,2);
+            B2 = videoFrame(:,:,3);
+            R2(~mask) = 0;
+            G2(~mask) = 0;
+            B2(~mask) = 0;
+            R2(mask) = 255;
+            G2(mask) = 255;
+            B2(mask) = 255;
+            imBinary = cat(3,R2,G2,B2);
+            imBinary = im2bw(imBinary);
+            
             [lowestCorner, ~] = find(bboxPoints==max(bboxPoints(:,2)));
             leftCorner = mod(lowestCorner(1)+1,5); if (leftCorner == 0); leftCorner = 1; end
             rightCorner = mod(lowestCorner(1)-1,5); if (rightCorner == 0); rightCorner = 4; end
-            im = videoFrame;
-            im = insertMarker(im, bboxPoints(lowestCorner(1),:),'x','color', 'red', 'size', 20);
-            im = insertMarker(im, bboxPoints(leftCorner,:),'x','color', 'white', 'size', 20);
-            im = insertMarker(im, bboxPoints(rightCorner,:),'x','color', 'cyan', 'size', 20);
             
             if length(lowestCorner) > 1
                 angle = 0;
@@ -68,11 +88,17 @@ while runLoop && frameCount < 100
             else
                 % rotate clockwise
                 angle = atand(abs(bboxPoints(lowestCorner,2) - bboxPoints(rightCorner,2))/abs(bboxPoints(lowestCorner,1) - bboxPoints(rightCorner,1))) * -1;
-            end
-            im = imrotate(im, angle);
+            end            
             
+            im = imrotate(im, angle);
+            imBinary = imrotate(imBinary, angle);
+            bboxRotated = regionprops(imBinary, 'BoundingBox');
+            
+            im = imcrop(im, bboxRotated.BoundingBox);
+            scaleFactor = 150/size(im,1);
+            im = imresize(im, scaleFactor);
             imwrite(im, strcat(folderName,'/',int2str(i),'.png'));
-
+            
             % Display a bounding box around the detected face.
             videoFrame = insertShape(videoFrame, 'Polygon', bboxPolygon, 'LineWidth', 3);
 
@@ -100,13 +126,34 @@ while runLoop && frameCount < 100
             % Convert the box corners into the [x1 y1 x2 y2 x3 y3 x4 y4]
             % format required by insertShape.
             bboxPolygon = reshape(bboxPoints', 1, []); 
+            
+            cropSize = size(videoFrame);
+            invbboxPoints = bboxPoints';
+            mask = poly2mask(double(invbboxPoints(1,:)), double(invbboxPoints(2,:)), cropSize(1,1), cropSize(1,2));
+            
+            R1 = videoFrame(:,:,1);
+            G1 = videoFrame(:,:,2);
+            B1 = videoFrame(:,:,3);
+            R1(~mask) = 0;
+            G1(~mask) = 0;
+            B1(~mask) = 0;
+            im = cat(3,R1,G1,B1);
+            
+            R2 = videoFrame(:,:,1);
+            G2 = videoFrame(:,:,2);
+            B2 = videoFrame(:,:,3);
+            R2(~mask) = 0;
+            G2(~mask) = 0;
+            B2(~mask) = 0;
+            R2(mask) = 255;
+            G2(mask) = 255;
+            B2(mask) = 255;
+            imBinary = cat(3,R2,G2,B2);
+            imBinary = im2bw(imBinary);
+            
             [lowestCorner, ~] = find(bboxPoints==max(bboxPoints(:,2)));
             leftCorner = mod(lowestCorner(1)+1,5); if (leftCorner == 0); leftCorner = 1; end
             rightCorner = mod(lowestCorner(1)-1,5); if (rightCorner == 0); rightCorner = 4; end
-            im = videoFrame;
-            im = insertMarker(im, bboxPoints(lowestCorner(1),:),'x','color', 'yellow', 'size', 20);
-            im = insertMarker(im, bboxPoints(leftCorner,:),'x','color', 'white', 'size', 20);
-            im = insertMarker(im, bboxPoints(rightCorner,:),'x','color', 'cyan', 'size', 20);
             
             if length(lowestCorner) > 1
                 angle = 0;
@@ -118,9 +165,12 @@ while runLoop && frameCount < 100
                 angle = atand(abs(bboxPoints(lowestCorner,2) - bboxPoints(rightCorner,2))/abs(bboxPoints(lowestCorner,1) - bboxPoints(rightCorner,1))) * -1;
             end
             im = imrotate(im, angle);
-%             im = imcrop(videoFrame, bbox);
-%             scaleFactor = 150/size(im,1);
-%             im = imresize(im, scaleFactor);
+            imBinary = imrotate(imBinary, angle);
+            bboxRotated = regionprops(imBinary, 'BoundingBox');
+            
+            im = imcrop(im, bboxRotated.BoundingBox);
+            scaleFactor = 150/size(im,1);
+            im = imresize(im, scaleFactor);
             imwrite(im, strcat(folderName,'/',int2str(i),'.png'));
 
             % Display a bounding box around the face being tracked.
